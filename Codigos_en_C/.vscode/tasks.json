@@ -2,26 +2,31 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "compilar programa en C",
+            "label": "compilar oscilador",
             "type": "shell",
             "command": "gcc",
             "args": [
-                "Codigos_en_C\\prueba.c",
+                "Codigos_en_C/oscilador.c",
+                "Codigos_en_C/integracion.c",
+                "Codigos_en_C/funciones_oscilador.c",
+                "Codigos_en_C/random.c",
                 "-o",
-                "Codigos_en_C\\prueba.exe"
+                "Codigos_en_C/oscilador.exe",
+                "-lm"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": ["$gcc"],
+            "detail": "Compila oscilador.c junto con todos los módulos necesarios en un ejecutable."
         },
         {
-            "label": "ejecutar programa en C",
+            "label": "ejecutar oscilador",
             "type": "shell",
-            "command": ".\\Codigos_en_C\\prueba.exe",
-            "group": "test"
+            "command": "Codigos_en_C/oscilador.exe",
+            "group": "test",
+            "detail": "Ejecuta el ejecutable generado de oscilador."
         }
     ]
 }
-
