@@ -1,4 +1,5 @@
 #include "random.h"
+#include "funciones_oscilador.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -82,7 +83,9 @@ void verlet_trayectoria(char* filename_input,double kb, double Temperatura,doubl
     double F_antiguo[N];
     double F_nuevo[N];
     double betta[N];
-
+    double Ek;
+    double Ep;
+    double Et;
 
     for(int i=0; i<N; i++) {
         x_antiguo[i] = x_0[i];
@@ -112,7 +115,12 @@ void verlet_trayectoria(char* filename_input,double kb, double Temperatura,doubl
          for(int i = 0; i < N; i++) {
               fprintf(archivo, " %.6f", v_nuevo[i]); // Velocidades
         }
-       
+        Ek=Energia_cinetica_instantanea(N,v_nuevo,m);
+        Ep=Energia_potencial_instantanea(N,x_nuevo,m,K);
+        Et=Energia_total_instantanea(N,x_nuevo,v_nuevo,m,K);
+        fprintf(archivo, " %.6f", Ek); // Cinetica
+        fprintf(archivo, " %.6f", Ep); // Potencial
+        fprintf(archivo, " %.6f", Et); // Total
         fprintf(archivo, "\n");
        
         for(int i=0; i<N; i++) {

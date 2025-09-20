@@ -31,6 +31,20 @@
             },
             "problemMatcher": [],
             "detail": "Ejecuta el programa oscilador.exe"
+         },
+        {
+            "label": "Ejecutar Python - Gráfica Oscilador",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/Codigo_en_Python_para_graficas/plot_osc.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Ejecuta el script de Python para generar la gráfica del oscilador"
         }
     ]
 }

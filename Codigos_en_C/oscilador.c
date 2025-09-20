@@ -8,9 +8,9 @@ int main(){
     if(FLAG==1){
         double kb=1.0;
         double Temperatura=1.0;
-        double alfa=0;
+        double alfa=10;
         int N=1;
-        double dt=0.01;
+        double dt=0.05;
         double m=1.0;
         int pasos=10000;
         double x_0[N];

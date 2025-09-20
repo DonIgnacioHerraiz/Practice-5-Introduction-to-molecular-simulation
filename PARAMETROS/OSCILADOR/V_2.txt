@@ -1,7 +1,7 @@
 K 1
 kb 1
 Temperatura 1
-alfa 0.01
+alfa 0.1
 N 1
 dt 0.05
 m 1
