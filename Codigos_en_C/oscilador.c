@@ -1,4 +1,4 @@
-#include "random.h"
+#include <stdio.h>
 #include "integracion.h"
 #include "funciones_oscilador.h"
 
