@@ -11,6 +11,12 @@ void Fuerza_verlet(int N, double x[], double F[], double K){
     }
 }
 
+void Fuerza_euler(int N, double x[], double p[], double F[], double K,double eta, double m){
+    for(int i=0; i<N; i++){
+        F[i] = -K * x[i] - eta * p[i]/m;
+    }
+}
+
 double Energia_cinetica_instantanea(int N, double v[], double m){
     double K=0;
     for(int i=0;i<N;i++){

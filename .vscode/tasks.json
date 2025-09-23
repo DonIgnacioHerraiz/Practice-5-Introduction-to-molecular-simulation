@@ -31,21 +31,39 @@
             },
             "problemMatcher": [],
             "detail": "Ejecuta el programa oscilador.exe"
-         },
+        },
         {
-            "label": "Ejecutar Python - Gráfica Oscilador",
+            "label": "Compilar Test Box-Muller",
             "type": "shell",
-            "command": "python",
+            "command": "gcc",
             "args": [
-                "${workspaceFolder}/Codigo_en_Python_para_graficas/plot_osc.py"
+                
+                "${workspaceFolder}/TESTS/Box-Muller/test_Box-Muller.c",
+                "${workspaceFolder}/Codigos_en_C/random.c",
+                "-I${workspaceFolder}/Codigos_en_C", // Indica la ruta del archivo random.h
+                "-o",
+                "${workspaceFolder}/TESTS/Box-Muller/test_Box-Muller.exe",
+                "-lm"
             ],
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Compila el test del generador de números aleatorios Box-Muller"
+        },
+        {
+            "label": "Correr Test Box-Muller",
+            "type": "shell",
+            "command": "${workspaceFolder}/TESTS/Box-Muller/test_Box-Muller.exe",
+            "group": {
+                "kind": "test",
+                "isDefault": false
             },
             "problemMatcher": [],
-            "detail": "Ejecuta el script de Python para generar la gráfica del oscilador"
+            "detail": "Ejecuta el programa test Box-Muller.exe"
         }
     ]
 }
+
 

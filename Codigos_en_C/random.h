@@ -10,6 +10,9 @@
 // Devuelve un número aleatorio uniforme en (0,1)
 double fran(void);
 
+// Inicializa el generador Parisi-Rapuano con una semilla
+void inicializa_PR(int SEMILLA);
+
 // Genera un número aleatorio N(0,1) con Box-Muller
 double gaussian(void);
 

@@ -256,3 +256,255 @@ void Verlet(double K,double kb, double Temperatura,double alfa,int N,double dt, 
 
 }
 
+
+
+//********************************EULER-MARUYAMA**********************************************
+
+
+
+/**
+ * Realiza un paso en la integración del movimiento usando el método de Verlet.
+ * @param gamma       Array con términos aleatorios para el ruido térmico.
+ * @param N           Número de partículas o elementos.
+ * @param x_antiguo   Array con las posiciones en el paso de tiempo anterior.
+ * @param x_nuevo     Array donde se almacenarán las nuevas posiciones.
+ * @param p_antiguo   Array con las velocidades en el paso de tiempo anterior.
+ * @param p_nuevo     Array donde se almacenarán las nuevas velocidades.
+ * @param h          Paso de tiempo.
+ * @param m           Masa de las partículas (asumida igual para todas).
+ * @param Fuerza      Puntero a función que calcula las fuerzas; recibe N, las posiciones las velocidades y un real.
+ * @param Fuerzas    Array donde se almacenarán las fuerzas en el paso de tiempo anterior.
+ * @param K           Constante del oscilador armónico.
+ * @param coef_damping Coeficiente de amortiguamiento.
+ */
+
+ void un_paso_euler(double gamma[], int N, double x_antiguo[], double x_nuevo[],double p_antiguo[], double p_nuevo[], double h, double m, void (*Fuerza)(int, double[],double[],double [],double,double,double), double Fuerzas[], double K, double eta) {
+
+    Fuerza(N, x_antiguo,p_antiguo,Fuerzas,K,eta,m);
+
+
+    for(int i=0; i<N; i++) {
+        x_nuevo[i] = x_antiguo[i] + p_antiguo[i]/m*h;
+    }
+   
+    for(int i=0; i<N; i++) {
+        p_nuevo[i] = p_antiguo[i] + Fuerzas[i]*h + gamma[i];
+    }
+
+
+}
+
+
+/**
+    * Realiza la integración del movimiento usando el método de Verlet durante un número dado de pasos.
+    * Los resultados se guardan en un archivo.
+    * @param kb              Constante de Boltzmann.
+    * @param Temperatura     Temperatura del sistema.
+    * @param eta           Coeficiente de fricción.
+    * @param N               Número de partículas o elementos.
+    * @param h              Paso de tiempo.  
+    * @param m               Masa de las partículas (asumida igual para todas).
+    * @param pasos           Número de pasos de tiempo a simular.
+    * @param Fuerza          Puntero a función que calcula las fuerzas; recibe N y un array de posiciones.
+    * @param filename_output Nombre del archivo donde se guardarán los resultados.
+    * @param x_0            Array con las posiciones iniciales.
+    * @param p_0            Array con las velocidades iniciales.
+ */
+
+void euler_trayectoria(char* filename_input,double kb, double Temperatura,double eta,int N,double h, double m, int pasos, void (*Fuerza)(int, double[],double[],double[],double,double,double), char*filename_output, double x_0[], double p_0[], double K) {
+
+    FILE *archivo = fopen(filename_output, "w");
+    if(archivo == NULL) {
+        printf("Error al abrir el archivo %s\n", filename_output);
+        return;
+    }
+   
+    fprintf(archivo, "%.6f %d\t%s\n", h, pasos, filename_input);
+
+
+    double x_antiguo[N];
+    double x_nuevo[N];
+    double p_antiguo[N];
+    double p_nuevo[N];
+    double v_antiguo[N]; //estas velocidades son solo para calcular la energía cinética
+    double v_nuevo[N];
+    double Fuerzas[N];
+    double gamma[N];
+    double Ek;
+    double Ep;
+    double Et;
+
+    for(int i=0; i<N; i++) {
+        x_antiguo[i] = x_0[i];
+        p_antiguo[i] = p_0[i];
+        x_nuevo[i] = 0;
+        p_nuevo[i] = 0;
+        Fuerzas[i] = 0;
+    }
+
+
+    for(int paso=0; paso<pasos; paso++) {
+       
+        for(int i=0; i<N; i++) {
+            gamma[i] = gaussian()*sqrt(2*eta*Temperatura*kb*h);
+        }
+
+
+        un_paso_euler(gamma,N,x_antiguo,x_nuevo,p_antiguo,p_nuevo,h,m,Fuerza,Fuerzas,K,eta);
+       
+        fprintf(archivo, "%.6f", paso * h); // Tiempo en la primera columna
+
+
+         for(int i = 0; i < N; i++) {
+              fprintf(archivo, " %.6f", x_nuevo[i]); // Posiciones
+        }
+         for(int i = 0; i < N; i++) {
+              fprintf(archivo, " %.6f", p_nuevo[i]); // Velocidades
+        }
+
+        for(int i=0; i<N; i++) {
+            v_antiguo[i]=p_antiguo[i]/m;
+            v_nuevo[i]=p_nuevo[i]/m;
+        }
+        
+        Ek=Energia_cinetica_instantanea(N,v_nuevo,m);
+        Ep=Energia_potencial_instantanea(N,x_nuevo,m,K);
+        Et=Energia_total_instantanea(N,x_nuevo,v_nuevo,m,K);
+        fprintf(archivo, " %.6f", Ek); // Cinetica
+        fprintf(archivo, " %.6f", Ep); // Potencial
+        fprintf(archivo, " %.6f", Et); // Total
+        fprintf(archivo, "\n");
+       
+        for(int i=0; i<N; i++) {
+            x_antiguo[i] = x_nuevo[i];
+            p_antiguo[i] = p_nuevo[i];
+        }
+    }
+    fclose(archivo);
+}
+
+/**
+    * Escribe en un fichero los parámetros de la simulación de Verlet. Lo hace en la carpeta PARAMETROS\OSCILADOR con el formato V_i, siendo i el primer número natural tal que no existe un archivo con ese nombre en la carpeta.
+    * @param kb              Constante de Boltzmann.
+    * @param Temperatura     Temperatura del sistema.
+    * @param eta           Coeficiente de fricción.
+    * @param N               Número de partículas o elementos.
+    * @param h              Paso de tiempo.  
+    * @param m               Masa de las partículas (asumida igual para todas).
+    * @param pasos           Número de pasos de tiempo a simular.
+    * @param x_0            Array con las posiciones iniciales.
+    * @param p_0            Array con los momentos iniciales.
+    * @param filename       Devuelve el nombre del archivo creado.
+ */
+
+void escribe_input_euler(double kb, double Temperatura, double eta, int N, double h, double m, int pasos,
+                          double x_0[], double p_0[], char filename[], double K) {
+    const char* folder = "PARAMETROS/OSCILADOR/EULER-MARUYAMA";
+    FILE* file;
+    int k = 0;
+
+
+    // Buscamos el primer E-M_k.txt que no exista
+    while (1) {
+        snprintf(filename, 256, "%s/E-M_%d.txt", folder, k);
+        file = fopen(filename, "r");
+        if (file) {
+            // El archivo existe, cerramos y probamos el siguiente
+            fclose(file);
+            k++;
+        } else {
+            // No existe, podemos usar este k
+            break;
+        }
+    }
+
+
+    // Creamos el archivo para escritura
+    file = fopen(filename, "w");
+    if (!file) {
+        printf("No se pudo crear el archivo %s\n", filename);
+        filename[0] = '\0'; // indicamos fallo
+        return;
+    }
+
+
+    // Escribimos los parámetros
+    fprintf(file, "K %g\n", K);
+    fprintf(file, "kb %g\n", kb);
+    fprintf(file, "Temperatura %g\n", Temperatura);
+    fprintf(file, "eta %g\n", eta);
+    fprintf(file, "N %d\n", N);
+    fprintf(file, "h %g\n", h);
+    fprintf(file, "m %g\n", m);
+    fprintf(file, "pasos %d\n", pasos);
+
+
+    // Escribimos los vectores x_0 y p_0
+    for (int i = 0; i < N; i++) {
+        fprintf(file, "x_0_%d %g\n", i, x_0[i]);
+    }
+    for (int i = 0; i < N; i++) {
+        fprintf(file, "p_0_%d %g\n", i, p_0[i]);
+    }
+
+
+    fclose(file);
+
+
+    printf("Archivo creado: %s\n", filename);
+}
+
+/**
+    * Lleva a cabo la simulacion completa de Verlet. Los parametros estan en la carpeta PARAMETROS\OSCILADOR, mientras que la trayectoria está en Resultados_simulacion\OSCILADOR\VERLET
+    * @param kb              Constante de Boltzmann.
+    * @param Temperatura     Temperatura del sistema.
+    * @param eta           Coeficiente de fricción.
+    * @param N               Número de partículas o elementos.
+    * @param h              Paso de tiempo.  
+    * @param m               Masa de las partículas (asumida igual para todas).
+    * @param pasos           Número de pasos de tiempo a simular.
+    * @param x_0            Array con las posiciones iniciales.
+    * @param p_0            Array con los momentos iniciales.
+    * @param Fuerza       Puntero a función que calcula las fuerzas; recibe N y un array de posiciones.
+ */
+
+void EulerMaruyama(double K,double kb, double Temperatura,double eta,int N,double h, double m, int pasos, void (*Fuerza)(int, double[],double[],double [],double,double,double), double x_0[], double p_0[]){
+    char filename_input[256];
+    escribe_input_euler(kb, Temperatura, eta, N, h, m, pasos, x_0, p_0, filename_input,K);
+
+
+    const char* folder = "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA";
+    char filename_output[256];
+    FILE* file;
+    int i = 0;
+
+
+    // Buscamos el primer E-M_i.txt que no exista
+    while (1) {
+        snprintf(filename_output, sizeof(filename_output), "%s/E-M_%d.txt", folder, i);
+        file = fopen(filename_output, "r");
+        if (file) {
+            // El archivo existe, cerramos y probamos el siguiente
+            fclose(file);
+            i++;
+        } else {
+            // No existe, podemos usar este i
+            break;
+        }
+    }
+
+
+    // Creamos el archivo
+    file = fopen(filename_output, "w");
+    if (!file) {
+        printf("No se pudo crear el archivo %s\n", filename_output);
+        return 1;
+    }
+    fclose(file);
+
+
+    euler_trayectoria(filename_input,kb,Temperatura,eta,N,h,m,pasos,Fuerza,filename_output,x_0,p_0,K);
+
+
+}
+
