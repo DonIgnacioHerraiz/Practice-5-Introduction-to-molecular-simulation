@@ -11,7 +11,7 @@ void Fuerza_verlet(int N, double x[], double F[], double K){
     }
 }
 
-void Fuerza_euler(int N, double x[], double p[], double F[], double K,double eta, double m){
+void Fuerza_euler(int N, double x[], double p[], double F[], double K,double eta, double m){ //Emplearemos esta función tanto para Euler como para Runge-Kutta
     for(int i=0; i<N; i++){
         F[i] = -K * x[i] - eta * p[i]/m;
     }

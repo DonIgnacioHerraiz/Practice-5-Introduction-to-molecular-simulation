@@ -246,7 +246,7 @@ void Verlet(double K,double kb, double Temperatura,double alfa,int N,double dt, 
     file = fopen(filename_output, "w");
     if (!file) {
         printf("No se pudo crear el archivo %s\n", filename_output);
-        return 1;
+        return;
     }
     fclose(file);
 
@@ -498,7 +498,7 @@ void EulerMaruyama(double K,double kb, double Temperatura,double eta,int N,doubl
     file = fopen(filename_output, "w");
     if (!file) {
         printf("No se pudo crear el archivo %s\n", filename_output);
-        return 1;
+        return;
     }
     fclose(file);
 
@@ -507,4 +507,270 @@ void EulerMaruyama(double K,double kb, double Temperatura,double eta,int N,doubl
 
 
 }
+
+//****************RUNGE KUTTA ESTOCASTICO DE ORDEN 2 ******************************
+/**
+ * Realiza un paso en la integración del movimiento usando el método de Verlet.
+ * @param Z           Array con términos aleatorios para el ruido térmico.
+ * @param N           Número de partículas o elementos.
+ * @param x_antiguo   Array con las posiciones en el paso de tiempo anterior.
+ * @param x_nuevo     Array donde se almacenarán las nuevas posiciones.
+ * @param p_antiguo   Array con las velocidades en el paso de tiempo anterior.
+ * @param p_nuevo     Array donde se almacenarán las nuevas velocidades.
+ * @param h          Paso de tiempo.
+ * @param m           Masa de las partículas (asumida igual para todas).
+ * @param Fuerza      Puntero a función que calcula las fuerzas; recibe N, las posiciones las velocidades y un real.
+ * @param K           Constante del oscilador armónico.
+ * @param eta         Coeficiente de amortiguamiento.
+ */
+void paso_RungeKutta2(double Z[], int N, double x_antiguo[], double x_nuevo[],double p_antiguo[], double p_nuevo[], double h, double m, void (*Fuerza)(int, double[],double[],double [],double,double,double), double K, double eta) {
+    double x_intermedio[N];
+    double p_intermedio[N];
+    //Funciones primera etapa
+    double fx1[N];
+    double gp1[N];
+    //Funciones segunda etapa
+    double fx2[N];
+    double gp2[N];
+    //Calculo de la fuerza para la primera etapa
+    for (int i=0; i<N; i++){
+        p_intermedio[i]=Z[i]+p_antiguo[i];// pn+Z
+    }
+    Fuerza(N, x_antiguo,p_intermedio,gp1,K,eta,m);//g(xn, pn+Z)
+    //Primera etapa
+    for(int i=0; i<N; i++) {
+        fx1[i] = p_intermedio[i]/m;
+    }
+    //Calculo de la fuerza para la segunda etapa
+    for (int i=0; i<N; i++){
+        x_intermedio[i]=x_antiguo[i]+h*fx1[i];// xn+h*f(xn, pn+Z)
+        p_intermedio[i]=p_antiguo[i]+h*gp1[i];// pn+h*g(xn, pn+Z)
+    }
+    Fuerza(N, x_intermedio,p_intermedio,gp2,K,eta,m);//g(xn+h*f(xn, pn+Z), pn+h*g(xn, pn+Z))
+    //Segunda etapa
+    for(int i=0; i<N; i++) {
+        fx2[i] = p_intermedio[i]/m;
+    }
+    //Actualización de las variables
+    for(int i=0; i<N; i++) {
+        x_nuevo[i] = x_antiguo[i] + (h/2.0)*(fx1[i]+fx2[i]);
+        p_nuevo[i] = p_antiguo[i] + (h/2.0)*(gp1[i]+gp2[i]) + Z[i];
+    }
+}
+
+/**
+    * Realiza la integración del movimiento usando el método de Verlet durante un número dado de pasos.
+    * Los resultados se guardan en un archivo.
+    * @param kb              Constante de Boltzmann.
+    * @param Temperatura     Temperatura del sistema.
+    * @param eta           Coeficiente de fricción.
+    * @param N               Número de partículas o elementos.
+    * @param h              Paso de tiempo.  
+    * @param m               Masa de las partículas (asumida igual para todas).
+    * @param pasos           Número de pasos de tiempo a simular.
+    * @param Fuerza          Puntero a función que calcula las fuerzas; recibe N y un array de posiciones.
+    * @param filename_output Nombre del archivo donde se guardarán los resultados.
+    * @param x_0            Array con las posiciones iniciales.
+    * @param p_0            Array con las velocidades iniciales.
+    * @param K           Constante del oscilador armónico.
+ */
+
+void rungeKutta_trayectoria(char* filename_input,double kb, double Temperatura,double eta,int N,double h, double m, int pasos, void (*Fuerza)(int, double[],double[],double[],double,double,double),  char*filename_output, double x_0[], double p_0[], double K) {
+
+    FILE *archivo = fopen(filename_output, "w");
+    if(archivo == NULL) {
+        printf("Error al abrir el archivo %s\n", filename_output);
+        return;
+    }
+   
+    fprintf(archivo, "%.6f %d\t%s\n", h, pasos, filename_input);
+
+
+    double x_antiguo[N];
+    double x_nuevo[N];
+    double p_antiguo[N];
+    double p_nuevo[N];
+    double v_antiguo[N]; //estas velocidades son solo para calcular la energía cinética
+    double v_nuevo[N];
+    double gamma[N];
+    double Ek;
+    double Ep;
+    double Et;
+
+    //Inicialización de arrays a cero para los que serán editados y a sus valores iniciales para los que no
+    for(int i=0; i<N; i++) {
+        x_antiguo[i] = x_0[i];
+        p_antiguo[i] = p_0[i];
+        x_nuevo[i] = 0;
+        p_nuevo[i] = 0;
+    }
+
+
+    for(int paso=0; paso<pasos; paso++) {
+        for(int i=0; i<N; i++) {
+            gamma[i] = gaussian()*sqrt(2*eta*Temperatura*kb*h);
+        }
+
+
+        paso_RungeKutta2(gamma,N,x_antiguo,x_nuevo,p_antiguo,p_nuevo,h,m,Fuerza,K,eta);
+       
+        fprintf(archivo, "%.6f", paso * h); // Tiempo en la primera columna
+
+
+         for(int i = 0; i < N; i++) {
+              fprintf(archivo, " %.6f", x_nuevo[i]); // Posiciones
+        }
+         for(int i = 0; i < N; i++) {
+              fprintf(archivo, " %.6f", p_nuevo[i]); // Velocidades
+        }
+
+        for(int i=0; i<N; i++) {
+            v_antiguo[i]=p_antiguo[i]/m;
+            v_nuevo[i]=p_nuevo[i]/m;
+        }
+        
+        Ek=Energia_cinetica_instantanea(N,v_nuevo,m);
+        Ep=Energia_potencial_instantanea(N,x_nuevo,m,K);
+        Et=Energia_total_instantanea(N,x_nuevo,v_nuevo,m,K);
+        fprintf(archivo, " %.6f", Ek); // Cinetica
+        fprintf(archivo, " %.6f", Ep); // Potencial
+        fprintf(archivo, " %.6f", Et); // Total
+        fprintf(archivo, "\n");
+       
+        for(int i=0; i<N; i++) {
+            x_antiguo[i] = x_nuevo[i];
+            p_antiguo[i] = p_nuevo[i];
+        }
+    }
+    fclose(archivo);
+}
+
+/**
+    * Escribe en un fichero los parámetros de la simulación de Verlet. Lo hace en la carpeta PARAMETROS\OSCILADOR con el formato V_i, siendo i el primer número natural tal que no existe un archivo con ese nombre en la carpeta.
+    * @param kb              Constante de Boltzmann.
+    * @param Temperatura     Temperatura del sistema.
+    * @param eta           Coeficiente de fricción.
+    * @param N               Número de partículas o elementos.
+    * @param h              Paso de tiempo.  
+    * @param m               Masa de las partículas (asumida igual para todas).
+    * @param pasos           Número de pasos de tiempo a simular.
+    * @param x_0            Array con las posiciones iniciales.
+    * @param p_0            Array con los momentos iniciales.
+    * @param filename       Devuelve el nombre del archivo creado.
+    * @param K           Constante del oscilador armónico.
+ */
+
+void escribe_input_RungeKutta(double kb, double Temperatura, double eta, int N, double h, double m, int pasos,double x_0[], double p_0[], char filename[], double K) {
+    const char* folder = "PARAMETROS/OSCILADOR/RUNGE-KUTTA";
+    FILE* file;
+    int k = 0;
+
+
+    // Buscamos el primer R-K_k.txt que no exista
+    while (1) {
+        snprintf(filename, 256, "%s/R-K_%d.txt", folder, k);
+        file = fopen(filename, "r");
+        if (file) {
+            // El archivo existe, cerramos y probamos el siguiente
+            fclose(file);
+            k++;
+        } else {
+            // No existe, podemos usar este k
+            break;
+        }
+    }
+
+
+    // Creamos el archivo para escritura
+    file = fopen(filename, "w");
+    if (!file) {
+        printf("No se pudo crear el archivo %s\n", filename);
+        filename[0] = '\0'; // indicamos fallo
+        return;
+    }
+
+
+    // Escribimos los parámetros
+    fprintf(file, "K %g\n", K);
+    fprintf(file, "kb %g\n", kb);
+    fprintf(file, "Temperatura %g\n", Temperatura);
+    fprintf(file, "eta %g\n", eta);
+    fprintf(file, "N %d\n", N);
+    fprintf(file, "h %g\n", h);
+    fprintf(file, "m %g\n", m);
+    fprintf(file, "pasos %d\n", pasos);
+
+
+    // Escribimos los vectores x_0 y p_0
+    for (int i = 0; i < N; i++) {
+        fprintf(file, "x_0_%d %g\n", i, x_0[i]);
+    }
+    for (int i = 0; i < N; i++) {
+        fprintf(file, "p_0_%d %g\n", i, p_0[i]);
+    }
+
+
+    fclose(file);
+
+
+    printf("Archivo creado: %s\n", filename);
+}
+
+/**
+    * Lleva a cabo la simulacion completa de Verlet. Los parametros estan en la carpeta PARAMETROS\OSCILADOR, mientras que la trayectoria está en Resultados_simulacion\OSCILADOR\VERLET
+    * @param kb              Constante de Boltzmann.
+    * @param Temperatura     Temperatura del sistema.
+    * @param eta           Coeficiente de fricción.
+    * @param N               Número de partículas o elementos.
+    * @param h              Paso de tiempo.  
+    * @param m               Masa de las partículas (asumida igual para todas).
+    * @param pasos           Número de pasos de tiempo a simular.
+    * @param x_0            Array con las posiciones iniciales.
+    * @param p_0            Array con los momentos iniciales.
+    * @param Fuerza       Puntero a función que calcula las fuerzas; recibe N y un array de posiciones.
+    * @param K           Constante del oscilador armónico.
+ */
+
+void RungeKutta2(double K,double kb, double Temperatura,double eta,int N,double h, double m, int pasos, 
+    void (*Fuerza)(int, double[],double[],double [],double,double,double), double x_0[], double p_0[]){
+    char filename_input[256];
+    escribe_input_RungeKutta(kb, Temperatura, eta, N, h, m, pasos, x_0, p_0, filename_input,K);
+
+
+    const char* folder = "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA";
+    char filename_output[256];
+    FILE* file;
+    int i = 0;
+
+
+    // Buscamos el primer R-K_i.txt que no exista
+    while (1) {
+        snprintf(filename_output, sizeof(filename_output), "%s/R-K_%d.txt", folder, i);
+        file = fopen(filename_output, "r");
+        if (file) {
+            // El archivo existe, cerramos y probamos el siguiente
+            fclose(file);
+            i++;
+        } else {
+            // No existe, podemos usar este i
+            break;
+        }
+    }
+
+
+    // Creamos el archivo
+    file = fopen(filename_output, "w");
+    if (!file) {
+        printf("No se pudo crear el archivo %s\n", filename_output);
+        return;
+    }
+    fclose(file);
+
+
+    rungeKutta_trayectoria(filename_input,kb,Temperatura,eta,N,h,m,pasos,Fuerza,filename_output,x_0,p_0,K);
+
+
+}
+
+
 

@@ -61,4 +61,21 @@ void EulerMaruyama(double K, double kb, double Temperatura, double eta,
             int N, double h, double m, int pasos,
             void (*Fuerza)(int, double[], double[], double [],double,double,double),
             double x_0[], double p_0[]);
+
+// Un paso del integrador de Runge-Kutta de orden 2
+ void paso_RungeKutta2(double Z[], int N, double x_antiguo[], double x_nuevo[],double p_antiguo[], double p_nuevo[], 
+    double h, double m, void (*Fuerza)(int, double[],double[],double [],double,double,double), double K, double eta);
+
+// Integra la trayectoria completa con Runge-Kutta y guarda en archivo
+void rungeKutta_trayectoria(char* filename_input,double kb, double Temperatura,double eta,int N,double h, double m, int pasos,
+     void (*Fuerza)(int, double[],double[],double[],double,double,double), 
+     char*filename_output, double x_0[], double p_0[], double K);
+
+// Escribe archivo de parámetros de entrada para una simulación de Runge-Kutta
+void escribe_input_RungeKutta(double kb, double Temperatura, double eta, int N, double h, double m, int pasos,
+      double x_0[], double p_0[], char filename[], double K);
+
+// Ejecuta simulación completa de Runge-Kutta (crea input y trayectoria)
+void RungeKutta2(double K,double kb, double Temperatura,double eta,int N,double h, double m, int pasos, 
+    void (*Fuerza)(int, double[],double[],double [],double,double,double), double x_0[], double p_0[]);
             
