@@ -5,18 +5,19 @@ import matplotlib.pyplot as plt
 # ──────────────────────────────
 # Configuración de rutas relativas
 # ──────────────────────────────
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # Nombre del archivo
-filename = "V_4.txt"
+filename = "V_1.txt"
 filename_no_ext = os.path.splitext(filename)[0]  
 
 # Rutas de datos y parámetros
-data_file = os.path.join(base_dir, "Resultados_simulacion", "OSCILADOR", "Verlet", filename)
-param_file = os.path.join(base_dir, "PARAMETROS", "OSCILADOR", filename)
-output_dir = os.path.join(base_dir, "Graficas", "OSCILADOR", "TRAYECTORIAS")
+data_file = os.path.join(base_dir, "Resultados_simulacion", "OSCILADOR", "VERLET", filename)
+param_file = os.path.join(base_dir, "PARAMETROS", "OSCILADOR", "VERLET", filename)
+output_dir = os.path.join(base_dir, "Graficas", "OSCILADOR", "VERLET", "TRAYECTORIAS_ENERGIAS")
 os.makedirs(output_dir, exist_ok=True)
 output_file = os.path.join(output_dir, f"{filename_no_ext}.png")  # guardará V_1.png
+
 
 # ──────────────────────────────
 # Leer parámetros del archivo
@@ -34,27 +35,34 @@ x_max = pasos * dt  # límite superior para el eje X
 # ──────────────────────────────
 # Cargar datos numéricos ignorando filas con texto
 # ──────────────────────────────
-data = np.genfromtxt(data_file, usecols=(0,1), invalid_raise=False)
+# Columnas: 0=tiempo, 3=E_potencial, 4=E_cinetica, 5=E_total
+data = np.genfromtxt(data_file, usecols=(0,3,4,5), invalid_raise=False)
 data = data[~np.isnan(data).any(axis=1)]  # filtrar filas con NaN
 
 tiempo = data[:, 0]
-posicion = data[:, 1]
+E_potencial = data[:, 1]
+E_cinetica = data[:, 2]
+E_total = data[:, 3]
 
 # ──────────────────────────────
-# Crear gráfica
+# Crear gráfica solo con puntos
 # ──────────────────────────────
 plt.figure(figsize=(8,5))
-plt.plot(tiempo, posicion, label=f"Oscilador armónico ({filename})", color="blue", marker='o', markersize=2, linestyle='-')
+plt.plot(tiempo, E_potencial, 'o', label="E_potencial", color="red", markersize=2)
+plt.plot(tiempo, E_cinetica, 'o', label="E_cinetica", color="green", markersize=2)
+plt.plot(tiempo, E_total, 'o', label="E_total", color="blue", markersize=2)
+
 plt.xlabel("Tiempo")
-plt.ylabel("Posición")
-plt.title(f"Trayectoria de un oscilador armónico ({filename})")
+plt.ylabel("Energía")
+plt.title(f"Energías del oscilador ({filename})")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
 
 # Ajustar límites de los ejes
-plt.xlim(0, x_max)      # eje X basado en pasos*dt
-plt.ylim(3.5, -3.5)     # invertido para que 1.5 esté arriba y -1.5 abajo
+plt.xlim(0, x_max)
+plt.ylim(min(E_potencial.min(), E_cinetica.min(), E_total.min())*1.1,
+         max(E_potencial.max(), E_cinetica.max(), E_total.max())*1.1)
 
 # Guardar la figura
 plt.savefig(output_file, dpi=300)

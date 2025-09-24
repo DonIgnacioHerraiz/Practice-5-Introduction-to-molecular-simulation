@@ -147,7 +147,7 @@ void verlet_trayectoria(char* filename_input,double kb, double Temperatura,doubl
 
 void escribe_input_verlet(double kb, double Temperatura, double alfa, int N, double dt, double m, int pasos,
                           double x_0[], double v_0[], char filename[], double K) {
-    const char* folder = "PARAMETROS/OSCILADOR";
+    const char* folder = "PARAMETROS/OSCILADOR/VERLET";
     FILE* file;
     int k = 0;
 
