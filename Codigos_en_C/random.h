@@ -17,8 +17,15 @@ void inicializa_PR(int SEMILLA);
 double gaussian(void);
 
 // Función histograma 1D
-void histogram (int *H, int N, double *data, int Thist, double *max, double *min, double *delta);
+void histogram (double *H, int N, double *data, int Thist, double *max, double *min, double *delta);
 
 // Función histograma 2D
 void histogram2D (int **H, int N, double *data1, double *data2, int Thist1, int Thist2, double *max1, double *min1, double *delta1,
     double *max2, double *min2, double *delta2);
+
+// Función principal de procesamiento
+void generar_histogramas(const char *carpeta_in, 
+                         const char *carpeta_out_vel, 
+                         const char *carpeta_out_pos, 
+                         const char *prefijo, 
+                         int bins);

@@ -4,7 +4,7 @@
 #include "random.h"
 
 int main(){
-    int FLAG=3; // FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta
+    int FLAG=4; // FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta, FLAG=4 para Histogramas, FLAG 5 PARA EQUIPARTICION
     
     inicializa_PR(123456); // Inicializa el generador con una semilla
 
@@ -59,11 +59,25 @@ int main(){
                 p_0[0]=0.0;
 
                 RungeKutta2(K, kb, Temperatura, eta, N, h, m, pasos, Fuerza_euler, x_0, p_0);
-            }
-            else{
-                printf("FLAG no válido. Use 1 para Verlet, 2 para Euler-Maruyama o 3 para Runge-Kutta.\n");
-            }
+            }else{
+                if(FLAG==4){
+                    generar_histogramas(
+        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA",                      // carpeta de entrada
+        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/HISTOGRAMAS/VELOCIDADES", // carpeta salida velocidades
+        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/HISTOGRAMAS/POSICIONES",  // carpeta salida posiciones
+        "R-K",   // prefijo de los ficheros de entrada (R-K_0.txt, R-K_1.txt, …)
+        50     // número de bins del histograma
+    );
+                
+            }else{
+                if(FLAG==5){
+                        procesar_archivos(
+        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA",
+        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/EQUIPARTICION.txt",
+        "R-K"
+    );
+                }
         }
     }
     return 0;
-}
+}}}

@@ -2,6 +2,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdio.h>
+#include <dirent.h>
 #define PI 3.14159265358979323846
 
 
@@ -66,7 +67,7 @@ double gaussian() {
  * @param delta Puntero a variable donde se almacenará el tamaño del intervalo del histograma.
 */
 
-void histogram (int *H, int N, double *data, int Thist, double *max, double *min, double *delta){
+void histogram (double *H, int N, double *data, int Thist, double *max, double *min, double *delta){
     int j;
     double normalization_factor;
     // Inicializamos el histograma a cero
@@ -91,7 +92,7 @@ void histogram (int *H, int N, double *data, int Thist, double *max, double *min
         }
     }
     //Normalizamos el histograma
-    normalization_factor = 1.0/(N * (*delta));
+    normalization_factor = 1.0/(N);
     for(int i=0; i<Thist; i++){
         H[i]=H[i]* normalization_factor;
     }
@@ -155,3 +156,98 @@ void histogram2D (int **H, int N, double *data1, double *data2, int Thist1, int 
         }
     }
 
+// Función principal de procesamiento
+void generar_histogramas(const char *carpeta_in, 
+                         const char *carpeta_out_vel, 
+                         const char *carpeta_out_pos, 
+                         const char *prefijo, 
+                         int bins) {
+    DIR *dir;
+    struct dirent *ent;
+
+    dir = opendir(carpeta_in);
+    if (!dir) {
+        perror("No se pudo abrir la carpeta de entrada");
+        return;
+    }
+
+    while ((ent = readdir(dir)) != NULL) {
+        if (strncmp(ent->d_name, prefijo, strlen(prefijo)) == 0 && strstr(ent->d_name, ".txt")) {
+            // Ruta al archivo de entrada
+            char ruta_in[512];
+            snprintf(ruta_in, sizeof(ruta_in), "%s/%s", carpeta_in, ent->d_name);
+
+            FILE *fin = fopen(ruta_in, "r");
+            if (!fin) {
+                perror("No se pudo abrir archivo de entrada");
+                continue;
+            }
+
+            char linea[512];
+            // saltar la primera línea
+            if (!fgets(linea, sizeof(linea), fin)) {
+                fclose(fin);
+                continue;
+            }
+
+            // reservar memoria dinámica para datos
+            int capacidad = 1000, N = 0;
+            double *posiciones = malloc(capacidad * sizeof(double));
+            double *velocidades = malloc(capacidad * sizeof(double));
+
+            while (fgets(linea, sizeof(linea), fin)) {
+                double c1, pos, vel, c4, c5, c6;
+                if (sscanf(linea, "%lf %lf %lf %lf %lf %lf", &c1, &pos, &vel, &c4, &c5, &c6) == 6) {
+                    if (N >= capacidad) {
+                        capacidad *= 2;
+                        posiciones = realloc(posiciones, capacidad * sizeof(double));
+                        velocidades = realloc(velocidades, capacidad * sizeof(double));
+                    }
+                    posiciones[N] = pos;
+                    velocidades[N] = vel;
+                    N++;
+                }
+            }
+            fclose(fin);
+
+            // arrays para histogramas
+            double *H_pos = malloc(bins * sizeof(double));
+            double *H_vel = malloc(bins * sizeof(double));
+
+            double min_p, max_p, delta_p;
+            double min_v, max_v, delta_v;
+
+            histogram(H_pos, N, posiciones, bins, &max_p, &min_p, &delta_p);
+            histogram(H_vel, N, velocidades, bins, &max_v, &min_v, &delta_v);
+
+            // crear archivos de salida
+            char ruta_pos[512], ruta_vel[512];
+            snprintf(ruta_pos, sizeof(ruta_pos), "%s/%s", carpeta_out_pos, ent->d_name);
+            snprintf(ruta_vel, sizeof(ruta_vel), "%s/%s", carpeta_out_vel, ent->d_name);
+
+            FILE *fpos = fopen(ruta_pos, "w");
+            FILE *fvel = fopen(ruta_vel, "w");
+
+            if (fpos) {
+                for (int i = 0; i < bins; i++) {
+                    double x_min = min_p + i * delta_p;
+                    fprintf(fpos, "%lf %lf\n", x_min, H_pos[i]);
+                }
+                fclose(fpos);
+            }
+            if (fvel) {
+                for (int i = 0; i < bins; i++) {
+                    double x_min = min_v + i * delta_v;
+                    fprintf(fvel, "%lf %lf\n", x_min, H_vel[i]);
+                }
+                fclose(fvel);
+            }
+
+            free(posiciones);
+            free(velocidades);
+            free(H_pos);
+            free(H_vel);
+        }
+    }
+    closedir(dir);
+}

@@ -16,3 +16,11 @@ double Energia_potencial_instantanea(int N, double x[], double m, double K);
 
 double Energia_total_instantanea(int N, double x[], double v[], double m, double K);
 
+int es_archivo_valido(const char *nombre, const char *prefijo);
+
+int extraer_indice(const char *nombre, const char *prefijo);
+
+void procesar_archivos(const char *carpeta, const char *archivo_salida, const char *c_input);
+
+
+
