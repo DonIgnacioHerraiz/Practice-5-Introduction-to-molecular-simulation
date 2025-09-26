@@ -28,7 +28,7 @@ int main(){
         if(FLAG==2){
         double kb=1.0;
         double Temperatura=1.0;
-        double eta=10;
+        double eta=1.0;
         int N=1;
         double h=0.001;
         double m=1.0;
@@ -62,10 +62,10 @@ int main(){
             }else{
                 if(FLAG==4){
                     generar_histogramas(
-        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA",                      // carpeta de entrada
-        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/HISTOGRAMAS/VELOCIDADES", // carpeta salida velocidades
-        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/HISTOGRAMAS/POSICIONES",  // carpeta salida posiciones
-        "R-K",   // prefijo de los ficheros de entrada (R-K_0.txt, R-K_1.txt, …)
+        "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA",                      // carpeta de entrada
+        "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA/HISTOGRAMAS/VELOCIDADES", // carpeta salida velocidades
+        "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA/HISTOGRAMAS/POSICIONES",  // carpeta salida posiciones
+        "E-M",   // prefijo de los ficheros de entrada (R-K_0.txt, R-K_1.txt, …)
         50     // número de bins del histograma
     );
                 

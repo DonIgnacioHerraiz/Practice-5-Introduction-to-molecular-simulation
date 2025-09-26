@@ -55,8 +55,8 @@ def plot_histograms(prefijo, carpeta_entrada, carpeta_salida):
             print(f"Guardado: {ruta_out}")
 
 # --- Ejemplo de uso ---
-prefijo = "R-K"
-carpeta_entrada = r"Resultados_simulacion\OSCILADOR\RUNGE-KUTTA\HISTOGRAMAS"
-carpeta_salida  = r"Graficas\OSCILADOR\RUNGE-KUTTA\HISTOGRAMAS"
+prefijo = "E-M"
+carpeta_entrada = r"Resultados_simulacion\OSCILADOR\EULER-MARUYAMA\HISTOGRAMAS"
+carpeta_salida  = r"Graficas\OSCILADOR\EULER-MARUYAMA\HISTOGRAMAS"
 
 plot_histograms(prefijo, carpeta_entrada, carpeta_salida)
