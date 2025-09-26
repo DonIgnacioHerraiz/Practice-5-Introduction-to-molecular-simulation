@@ -773,4 +773,3 @@ void RungeKutta2(double K,double kb, double Temperatura,double eta,int N,double 
 }
 
 
-

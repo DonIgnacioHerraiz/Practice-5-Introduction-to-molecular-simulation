@@ -46,7 +46,7 @@ int main(){
               // Implementación de Runge-Kutta
                 double kb=1.0;
                 double Temperatura=1.0;
-                double eta=10;
+                double eta=0.0;
                 int N=1;
                 double h=0.001;
                 double m=1.0;

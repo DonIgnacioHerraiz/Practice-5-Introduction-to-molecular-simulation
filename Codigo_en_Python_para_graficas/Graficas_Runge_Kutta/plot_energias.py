@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # Nombre del archivo
-filename = "R-K_0.txt"
+filename = "R-K_3.txt"
 filename_no_ext = os.path.splitext(filename)[0]  
 
 # Rutas de datos y parámetros
@@ -28,7 +28,7 @@ with open(param_file, 'r') as f:
         key, value = line.split()
         params[key] = float(value)
 
-dt = params["dt"]
+dt = params["h"]
 pasos = int(params["pasos"])
 x_max = pasos * dt  # límite superior para el eje X
 
