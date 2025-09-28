@@ -112,11 +112,27 @@ void histogram (double *H, int N, double *data, int Thist, double *max, double *
  * @param max2  Puntero a variable donde se almacenará el valor máximo encontrado en data2.
  * @param min2  Puntero a variable donde se almacenará el valor mínimo encontrado en data2.
  * @param delta2 Puntero a variable donde se almacenará el tamaño del intervalo del histograma en la segunda dimensión.
+ * @param filename Nombre del archivo donde se guardará el histograma.
 */
-void histogram2D (int **H, int N, double *data1, double *data2, int Thist1, int Thist2, double *max1, double *min1, double *delta1,
-    double *max2, double *min2, double *delta2){
+void histogram2D (double **H, int N, double *data1, double *data2, int Thist1, int Thist2, double *max1, double *min1, double *delta1,
+    double *max2, double *min2, double *delta2, char* filename){
         int j1,j2;
         double normalization_factor;
+        // Asignar memoria para las filas
+        H = (double **)malloc(Thist1 * sizeof(double *));
+        if (H == NULL) {
+            printf("Error: No se pudo asignar memoria para las filas.\n");
+            return;
+        }
+
+        // Asignar memoria para cada columna de cada fila
+        for (int i = 0; i < Thist1; i++) {
+            H[i] = (double *)calloc(Thist2, sizeof(double));
+            if (H[i] == NULL) {
+                printf("Error: No se pudo asignar memoria para la fila %d.\n", i);
+                return;
+            }
+        }
         // Inicializamos el histograma a cero
         for (int i=0; i<Thist1; i++){
             for(int k=0; k<Thist2; k++){
@@ -153,6 +169,23 @@ void histogram2D (int **H, int N, double *data1, double *data2, int Thist1, int 
             for(int k=0; k<Thist2; k++){
                 H[i][k]=H[i][k]* normalization_factor;
             }
+        }
+        //Escribimos el histograma en un archivo
+        FILE *file=fopen(filename, "w");
+        if(file==NULL){
+            printf("Error al abrir el archivo %s\n", filename);
+            return;
+        }
+        for (int i=0; i<Thist1; i++){
+            for (int k=0; k<Thist2; k++){
+                fprintf(file, "%lf", H[i][k]);
+            }
+            fprintf(file, "\n");
+        }
+        fclose(file);
+        // Liberamos la memoria dinámica
+        for (int i = 0; i < Thist1; i++) {
+            free(H[i]);
         }
     }
 

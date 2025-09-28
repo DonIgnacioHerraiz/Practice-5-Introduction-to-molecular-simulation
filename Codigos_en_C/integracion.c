@@ -771,5 +771,64 @@ void RungeKutta2(double K,double kb, double Temperatura,double eta,int N,double 
 
 
 }
+/** 
+    @param x_final: array donde se guardan las posiciones finales
+    @param p_final: array donde se guardan los momentos finales
+    @param k: número del archivo R-K_k.txt del que se quieren obtener los datos
+*/
+
+void RungeKutta2_pos_mom(double x_final[], double p_final[], int k, int num_data){
+    FILE *file;
+    const char* folder = "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA";
+    char filename[256];
+    // Buscamos el primer R-K_k.txt que queramos dentro de los que hayamos creado previamente
+    snprintf(filename, 256, "%s/R-K_%d.txt", folder,k);
+    file = fopen(filename, "r");
+    if (!file)
+    {
+        printf("No se pudo abrir el archivo %s\n", filename);
+        return;
+    }
+    //leer archivo para obtener las posiciones y momentos finales
+    int contador_lineas=0;
+    while (!feof(file))
+    {
+        double a1,a2,a3,a4,a5;
+        if (contador_lineas==1){
+            fscanf(file, "%lf %lf %lf %lf %lf",&a1,&a2,&a3,&a4,&a5); // Saltar el tiempo
+            x_final[contador_lineas-1]=a2;
+            p_final[contador_lineas-1]=a3;  
+        }
+
+        contador_lineas++;
+
+    }    
+    num_data=contador_lineas; 
+    fclose(file);
+} 
+/**
+ * @param k: número del archivo R-K_k.txt del que se quieren obtener los datos
+ * @param num_data: número de datos que hay en el archivo
+ * @param num_bins: número de bins que se quieren en el histograma
+ */
+
+//Funcion que me cree el histograma de las posiciones y momentos finales con la funcion Histograma2D y me cree archivo con el propio histograma
+void RungeKutta2_histograma(int k){
+    int num_data;
+    int num_bins=50;
+    double **H;//Donde guardaremos el histograma 2D
+    double max1, min1, delta1;
+    double max2, min2, delta2;
+    char filename[256];
+    double x_final[num_data];
+    double p_final[num_data];
+    //Leemos el archivo R-K_k.txt para obtener las posiciones y momentos finales
+    RungeKutta2_pos_mom(x_final, p_final, k, num_data);
+    //Creamos el histograma 2D
+    const char* folder = "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/HISTOGRAMA/2D";
+    snprintf(filename, 256, "%s/Histograma_R-K-2D_%d.txt", folder,k);
+    histogram2D(H,num_data,x_final,p_final,num_bins,num_bins,&max1,&min1,&delta1,&max2,&min2,&delta2,filename);
+}
+
 
 

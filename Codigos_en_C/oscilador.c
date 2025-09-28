@@ -4,7 +4,7 @@
 #include "random.h"
 
 int main(){
-    int FLAG=4; // FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta, FLAG=4 para Histogramas, FLAG 5 PARA EQUIPARTICION
+    int FLAG=3; // FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta, FLAG=4 para Histogramas, FLAG 5 PARA EQUIPARTICION
     
     inicializa_PR(123456); // Inicializa el generador con una semilla
 
@@ -54,11 +54,15 @@ int main(){
                 double x_0[N];
                 double p_0[N];
                 double K=1.0;
-
+                int decision=1;
                 x_0[0]=1.0; 
                 p_0[0]=0.0;
-
-                RungeKutta2(K, kb, Temperatura, eta, N, h, m, pasos, Fuerza_euler, x_0, p_0);
+                if (decision==0){
+                    RungeKutta2(K, kb, Temperatura, eta, N, h, m, pasos, Fuerza_euler, x_0, p_0);
+                }
+                else{
+                    RungeKutta2_histograma(1);
+                }
             }else{
                 if(FLAG==4){
                     generar_histogramas(

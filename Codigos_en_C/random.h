@@ -19,9 +19,8 @@ double gaussian(void);
 // Función histograma 1D
 void histogram (double *H, int N, double *data, int Thist, double *max, double *min, double *delta);
 
-// Función histograma 2D
-void histogram2D (int **H, int N, double *data1, double *data2, int Thist1, int Thist2, double *max1, double *min1, double *delta1,
-    double *max2, double *min2, double *delta2);
+void histogram2D (double **H, int N, double *data1, double *data2, int Thist1, int Thist2, double *max1, double *min1, double *delta1,
+    double *max2, double *min2, double *delta2, char* filename);
 
 // Función principal de procesamiento
 void generar_histogramas(const char *carpeta_in, 
