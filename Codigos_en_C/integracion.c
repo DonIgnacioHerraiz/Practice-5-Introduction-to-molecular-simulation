@@ -352,15 +352,7 @@ void euler_trayectoria(char* filename_input,double kb, double Temperatura,double
 
         un_paso_euler(gamma,N,x_antiguo,x_nuevo,p_antiguo,p_nuevo,h,m,Fuerza,Fuerzas,K,eta);
        
-        fprintf(archivo, "%.6f", paso * h); // Tiempo en la primera columna
-
-
-         for(int i = 0; i < N; i++) {
-              fprintf(archivo, " %.6f", x_nuevo[i]); // Posiciones
-        }
-         for(int i = 0; i < N; i++) {
-              fprintf(archivo, " %.6f", p_nuevo[i]); // Velocidades
-        }
+        
 
         for(int i=0; i<N; i++) {
             v_antiguo[i]=p_antiguo[i]/m;
@@ -370,11 +362,26 @@ void euler_trayectoria(char* filename_input,double kb, double Temperatura,double
         Ek=Energia_cinetica_instantanea(N,v_nuevo,m);
         Ep=Energia_potencial_instantanea(N,x_nuevo,m,K);
         Et=Energia_total_instantanea(N,x_nuevo,v_nuevo,m,K);
-        fprintf(archivo, " %.6f", Ek); // Cinetica
-        fprintf(archivo, " %.6f", Ep); // Potencial
-        fprintf(archivo, " %.6f", Et); // Total
-        fprintf(archivo, "\n");
-       
+
+        if((h*paso*10-((int)(h*paso*10)))<1e-10) {   // Guardamos cada 0.1 unidades de tiempo
+            fprintf(archivo, "%.6f", paso * h); // Tiempo en la primera columna
+
+
+            for(int i = 0; i < N; i++) {
+              fprintf(archivo, " %.6f", x_nuevo[i]); // Posiciones
+            }
+            for(int i = 0; i < N; i++) {
+              fprintf(archivo, " %.6f", v_nuevo[i]); // Velocidades
+            }
+
+
+            fprintf(archivo, " %.6f", Ek); // Cinetica
+            fprintf(archivo, " %.6f", Ep); // Potencial
+            fprintf(archivo, " %.6f", Et); // Total
+            fprintf(archivo, "\n");
+
+        }
+
         for(int i=0; i<N; i++) {
             x_antiguo[i] = x_nuevo[i];
             p_antiguo[i] = p_nuevo[i];

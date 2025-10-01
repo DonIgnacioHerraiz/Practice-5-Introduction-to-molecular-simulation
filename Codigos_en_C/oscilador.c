@@ -4,8 +4,8 @@
 #include "random.h"
 
 int main(){
-    int FLAG=4; // FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta, FLAG=4 para Histogramas, FLAG 5 PARA EQUIPARTICION
-    
+    int FLAG=2; // FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta, FLAG=4 para Histogramas, FLAG 5 PARA EQUIPARTICION
+    int FICHEROS=2;// FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta
     inicializa_PR(123456); // Inicializa el generador con una semilla
 
     if(FLAG==1){
@@ -32,7 +32,7 @@ int main(){
         int N=1;
         double h=0.001;
         double m=1.0;
-        int pasos=10000;
+        int pasos=10000000;
         double x_0[N];
         double p_0[N];
         double K=1.0;
@@ -61,23 +61,54 @@ int main(){
                 RungeKutta2(K, kb, Temperatura, eta, N, h, m, pasos, Fuerza_euler, x_0, p_0);
             }else{
                 if(FLAG==4){
-                    generar_histogramas(
-        "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA",                      // carpeta de entrada
-        "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA/HISTOGRAMAS/VELOCIDADES", // carpeta salida velocidades
-        "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA/HISTOGRAMAS/POSICIONES",  // carpeta salida posiciones
-        "E-M",   // prefijo de los ficheros de entrada (R-K_0.txt, R-K_1.txt, …)
-        50     // número de bins del histograma
-    );
-                
+                    switch(FICHEROS){
+                        case 1:
+                            generar_histogramas(
+                            "Resultados_simulacion/OSCILADOR/VERLET",                      // carpeta de entrada
+                            "Resultados_simulacion/OSCILADOR/VERLET/HISTOGRAMAS/VELOCIDADES", // carpeta salida velocidades
+                            "Resultados_simulacion/OSCILADOR/VERLET/HISTOGRAMAS/POSICIONES",  // carpeta salida posiciones
+                            "V",   // prefijo de los ficheros de entrada (R-K_0.txt, R-K_1.txt, …)
+                            50     // número de bins del histograma
+                            );break;
+                        case 2:
+                            generar_histogramas(
+                            "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA",                      // carpeta de entrada
+                            "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA/HISTOGRAMAS/VELOCIDADES", // carpeta salida velocidades
+                            "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA/HISTOGRAMAS/POSICIONES",  // carpeta salida posiciones
+                            "E-M",   // prefijo de los ficheros de entrada (R-K_0.txt, R-K_1.txt, …)
+                            50     // número de bins del histograma
+                            );break;
+                        case 3:
+                            generar_histogramas(
+                            "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA",                      // carpeta de entrada
+                            "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/HISTOGRAMAS/VELOCIDADES", // carpeta salida velocidades
+                            "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/HISTOGRAMAS/POSICIONES",  // carpeta salida posiciones
+                            "R-K",   // prefijo de los ficheros de entrada (R-K_0.txt, R-K_1.txt, …)
+                            50     // número de bins del histograma
+                            );break;}
             }else{
                 if(FLAG==5){
-                        procesar_archivos(
-        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA",
-        "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/EQUIPARTICION.txt",
-        "R-K"
-    );
+                    switch(FICHEROS){
+                        case 1:
+                            procesar_archivos(
+                            "Resultados_simulacion/OSCILADOR/VERLET",
+                            "Resultados_simulacion/OSCILADOR/VERLET/EQUIPARTICION.txt",
+                            "V"
+                            );break;
+                        case 2:
+                            procesar_archivos(
+                            "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA",
+                            "Resultados_simulacion/OSCILADOR/EULER-MARUYAMA/EQUIPARTICION.txt",
+                            "E-M"
+                            );break;
+                        case 3:
+                            procesar_archivos(
+                            "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA",
+                            "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA/EQUIPARTICION.txt",
+                            "R-K"
+                            );break;
                 }
         }
     }
     return 0;
-}}}
+}}}}
