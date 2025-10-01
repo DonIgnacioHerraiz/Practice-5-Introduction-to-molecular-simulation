@@ -79,3 +79,8 @@ void escribe_input_RungeKutta(double kb, double Temperatura, double eta, int N, 
 void RungeKutta2(double K,double kb, double Temperatura,double eta,int N,double h, double m, int pasos, 
     void (*Fuerza)(int, double[],double[],double [],double,double,double), double x_0[], double p_0[]);
             
+//Funcion que me saque directamente las posiciones y momentos 
+void RungeKutta2_pos_mom(double x_final[], double p_final[], int k, int num_data);
+
+//Funcion que me cree el histograma de las posiciones y momentos finales con la funcion Histograma2D y me cree archivo con el propio histograma
+void RungeKutta2_histograma(int k);
