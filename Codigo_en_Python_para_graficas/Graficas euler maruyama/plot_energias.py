@@ -35,7 +35,7 @@ x_max = pasos * dt  # límite superior para el eje X
 # Cargar datos numéricos ignorando filas con texto
 # ──────────────────────────────
 # Columnas: 0=tiempo, 3=E_potencial, 4=E_cinetica, 5=E_total
-data = np.genfromtxt(data_file, usecols=(0,3,4,5), invalid_raise=False)
+data = np.genfromtxt(data_file, usecols=(0,3,4,5),skip_header=1, invalid_raise=False)
 data = data[~np.isnan(data).any(axis=1)]  # filtrar filas con NaN
 
 tiempo = data[:, 0]

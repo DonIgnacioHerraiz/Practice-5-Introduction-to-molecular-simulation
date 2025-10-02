@@ -4,18 +4,18 @@
 #include "random.h"
 
 int main(){
-    int FLAG=2; // FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta, FLAG=4 para Histogramas, FLAG 5 PARA EQUIPARTICION
+    int FLAG=4; // FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta, FLAG=4 para Histogramas, FLAG 5 PARA EQUIPARTICION
     int FICHEROS=2;// FLAG=1 para Verlet, FLAG=2 para Euler-Maruyama y FLAG=3 para Runge-Kutta
     inicializa_PR(123456); // Inicializa el generador con una semilla
 
     if(FLAG==1){
         double kb=1.0;
         double Temperatura=1.0;
-        double alfa=10;
+        double alfa=0.0;
         int N=1;
         double dt=0.05;
         double m=1.0;
-        int pasos=10000;
+        int pasos=10000000;
         double x_0[N];
         double v_0[N];
         double K=1.0;
@@ -28,7 +28,7 @@ int main(){
         if(FLAG==2){
         double kb=1.0;
         double Temperatura=1.0;
-        double eta=1.0;
+        double eta=0.0;
         int N=1;
         double h=0.001;
         double m=1.0;
@@ -48,13 +48,13 @@ int main(){
                 double Temperatura=1.0;
                 double eta=0.0;
                 int N=1;
-                double h=0.001;
+                double h=0.01;
                 double m=1.0;
-                int pasos=10000;
+                int pasos=10000000;
                 double x_0[N];
                 double p_0[N];
                 double K=1.0;
-                int decision=1;
+                int decision=0;
                 x_0[0]=1.0; 
                 p_0[0]=0.0;
                 if (decision==0){

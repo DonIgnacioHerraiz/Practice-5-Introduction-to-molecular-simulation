@@ -92,7 +92,7 @@ void histogram (double *H, int N, double *data, int Thist, double *max, double *
         }
     }
     //Normalizamos el histograma
-    normalization_factor = 1.0/(N);
+    normalization_factor = 1.0/(N)/(*delta);
     for(int i=0; i<Thist; i++){
         H[i]=H[i]* normalization_factor;
     }
@@ -263,18 +263,20 @@ void generar_histogramas(const char *carpeta_in,
 
             if (fpos) {
                 for (int i = 0; i < bins; i++) {
-                    double x_min = min_p + i * delta_p;
-                    fprintf(fpos, "%lf %lf\n", x_min, H_pos[i]);
+                    double x_centro = min_p + (i + 0.5) * delta_p;
+                    fprintf(fpos, "%lf %lf\n", x_centro, H_pos[i]);
                 }
                 fclose(fpos);
             }
+
             if (fvel) {
                 for (int i = 0; i < bins; i++) {
-                    double x_min = min_v + i * delta_v;
-                    fprintf(fvel, "%lf %lf\n", x_min, H_vel[i]);
+                    double v_centro = min_v + (i + 0.5) * delta_v;
+                    fprintf(fvel, "%lf %lf\n", v_centro, H_vel[i]);
                 }
                 fclose(fvel);
             }
+
 
             free(posiciones);
             free(velocidades);
