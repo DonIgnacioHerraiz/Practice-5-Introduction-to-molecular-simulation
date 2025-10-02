@@ -668,7 +668,12 @@ void rungeKutta_trayectoria(char* filename_input,double kb, double Temperatura,d
  */
 
 void escribe_input_RungeKutta(double kb, double Temperatura, double eta, int N, double h, double m, int pasos,double x_0[], double p_0[], char filename[], double K) {
+    #ifdef OSCILADOR
     const char* folder = "PARAMETROS/OSCILADOR/RUNGE-KUTTA";
+    #endif
+    #ifdef DOBLE_POZO
+    const char* folder = "PARAMETROS/DOBLE_POZO";
+    #endif
     FILE* file;
     int k = 0;
 
@@ -743,8 +748,12 @@ void RungeKutta2(double K,double kb, double Temperatura,double eta,int N,double 
     char filename_input[256];
     escribe_input_RungeKutta(kb, Temperatura, eta, N, h, m, pasos, x_0, p_0, filename_input,K);
 
-
+    #ifdef OSCILADOR
     const char* folder = "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA";
+    #endif
+    #ifdef DOBLE_POZO
+    const char* folder = "Resultados_simulacion/DOBLE_POZO";
+    #endif
     char filename_output[256];
     FILE* file;
     int i = 0;
@@ -786,7 +795,13 @@ void RungeKutta2(double K,double kb, double Temperatura,double eta,int N,double 
 
 void RungeKutta2_pos_mom(double x_final[], double p_final[], int k, int num_data){
     FILE *file;
+    #ifdef OSCILADOR
     const char* folder = "Resultados_simulacion/OSCILADOR/RUNGE-KUTTA";
+    #endif
+    #ifdef DOBLE_POZO
+    const char* folder = "Resultados_simulacion/DOBLE_POZO";
+    #endif
+    
     char filename[256];
     // Buscamos el primer R-K_k.txt que queramos dentro de los que hayamos creado previamente
     snprintf(filename, 256, "%s/R-K_%d.txt", folder,k);

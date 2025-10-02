@@ -6,6 +6,9 @@
 #include <dirent.h>
 #include <math.h>
 
+// #define OSCILADOR
+#define DOBLE_POZO
+
 void Fuerza_verlet(int N, double x[], double F[], double K);
 
 void Fuerza_euler(int N, double x[], double p[], double F[], double K,double eta, double m);

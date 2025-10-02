@@ -62,6 +62,37 @@
             },
             "problemMatcher": [],
             "detail": "Ejecuta el programa test Box-Muller.exe"
+        },
+        {
+            "label": "Compilar Doble Pozo",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "${workspaceFolder}/Codigos_en_C/doble_pozo.c",
+                "${workspaceFolder}/Codigos_en_C/funciones_oscilador.c",
+                "${workspaceFolder}/Codigos_en_C/integracion.c",
+                "${workspaceFolder}/Codigos_en_C/random.c",
+                "-o",
+                "${workspaceFolder}/Codigos_en_C/doble_pozo.exe",
+                "-lm"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Compila todo el proyecto de doble pozo"
+        },
+        {
+            "label": "Correr Doble Pozo",
+            "type": "shell",
+            "command": "${workspaceFolder}/Codigos_en_C/doble_pozo.exe",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Ejecuta el programa doble_pozo.exe"
         }
     ]
 }

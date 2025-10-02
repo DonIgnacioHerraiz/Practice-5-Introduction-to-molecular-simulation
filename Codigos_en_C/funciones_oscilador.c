@@ -4,7 +4,9 @@
 #include <string.h>
 #include <dirent.h>
 #include <math.h>
+#include "funciones_oscilador.h"
 
+#ifdef OSCILADOR
 void Fuerza_verlet(int N, double x[], double F[], double K){
     for(int i=0; i<N; i++){
         F[i] = -K * x[i];
@@ -16,7 +18,20 @@ void Fuerza_euler(int N, double x[], double p[], double F[], double K,double eta
         F[i] = -K * x[i] - eta * p[i]/m;
     }
 }
+#endif
+#ifdef DOBLE_POZO
+void Fuerza_verlet(int N, double x[], double F[], double K){
+    for(int i=0; i<N; i++){
+        F[i] = -4*K*x[i]*(x[i]*x[i]-1);
+    }
+}
 
+void Fuerza_euler(int N, double x[], double p[], double F[], double K,double eta, double m){ //Emplearemos esta función tanto para Euler como para Runge-Kutta
+    for(int i=0; i<N; i++){
+        F[i] = -4*K*x[i]*(x[i]*x[i]-1) - eta * p[i]/m;
+    }
+}
+#endif
 double Energia_cinetica_instantanea(int N, double v[], double m){
     double K=0;
     for(int i=0;i<N;i++){
