@@ -6,3 +6,17 @@
 - Probar a simular con distintos pasos de tiempo.
 - Hacer cálculos de la equipartición de la energía.
 - Medir los tiempos físicos en un ordenador para ver cuál es el q menos tarda
+
+# Notas Tutoría Follana (Día 1)
+
+Ir haciendo el informe con todo el proceso que estamos realizando para que en 2 meses no se nos olvide.
+
+Variables observables para la termalización: <sigma_i>=0, plaquetas...
+No hay forma analítica para comprobar si está termalizado. 
+Observar comportamiento en varias simulaciones desde diferentes simulaciones para poder comprobar si está termalizado.
+
+Realizar análisis mediante promedios cuando hayamos medido N medidas y así tener menos medidas con cada una teniendo estadística con errores asociados. (Mejor nota)
+
+Podemos comprobar que para beta tendiendo a infinito, teniendo T =0 la energía va a ir decreciendo cuando partamos de esa condición inicial.
+
+En el informe no hay que poner el codigo pero sí que podemos poner cómo hemos codificado las variables y demás.
